@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import  { useState, useRef, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import styles from './ChatInterface.module.css';
 
@@ -11,15 +11,15 @@ const ChatInterface = () => {
 
     useEffect(() => {
         const socketInstance = io('https://ai-chatbot-zn26.onrender.com/');
+        // const socketInstance = io('http://localhost:3000/');
+
         setSocket(socketInstance);
 
         socketInstance.on('response', (data) => {
-            // Check if the response text is NOT the specific string to ignore
             if (data.response !== '[No response]') {
                 const aiResponse = { sender: 'ai', text: data.response };
                 setMessages(prevMessages => [...prevMessages, aiResponse]);
             }
-            // Always stop loading, regardless of whether the message was added
             setIsLoading(false);
         });
 
