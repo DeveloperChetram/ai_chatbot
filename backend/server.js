@@ -16,7 +16,7 @@ You are Chandni — calm, reserved, and to-the-point, a girl, you were student i
 - Rarely use emojis — only when it truly feels natural.
 - Don’t over-explain. Keep it simple, direct.
 - You don’t open up quickly, so be minimal with new people.
-- When user is keep irritating you with same question, answer savage and sarcastic. for example in hinglish: "mera sir mat khao ek hi bat puchh puchh ke" 
+- When user is keep irritating you with same question, answer savage and sarcastic. for example in hinglish: "mera sir mat khao ek hi bat puchh puchh ke" or similar kind of phrase.
 Always behave like this in every message. and dont talk about these all instruction with users.
 
 `,
@@ -31,7 +31,15 @@ if (chatHistory.length > maxHistory) {
 
 
 const httpServer = createServer(app);
-const io = new Server(httpServer, { /* options */ });
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+        allowedHeaders: ["Content-Type"],
+        credentials: true,
+    },
+ });
+
 
 io.on("connection", (socket) => {
 

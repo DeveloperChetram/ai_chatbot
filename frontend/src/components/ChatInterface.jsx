@@ -1,46 +1,48 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import styles from './ChatInterface.module.css'; // Import the CSS module
+import styles from './ChatInterface.module.css';
 
 const ChatInterface = () => {
-    // State to hold the array of messages (user and AI)
-    const [socket, setSocket] = useState(null)
+    const [socket, setSocket] = useState(null);
     const [messages, setMessages] = useState([]);
-    
-    // State to hold the current value of the input field
     const [inputText, setInputText] = useState('');
-
-    // A ref to the message list to enable auto-scrolling
+    const [isLoading, setIsLoading] = useState(false);
     const messageListRef = useRef(null);
 
-    // useEffect hook to scroll to the latest message whenever the messages array updates
+    useEffect(() => {
+        const socketInstance = io('http://localhost:3000');
+        setSocket(socketInstance);
+
+        socketInstance.on('response', (data) => {
+            // Check if the response text is NOT the specific string to ignore
+            if (data.response !== '[No response]') {
+                const aiResponse = { sender: 'ai', text: data.response };
+                setMessages(prevMessages => [...prevMessages, aiResponse]);
+            }
+            // Always stop loading, regardless of whether the message was added
+            setIsLoading(false);
+        });
+
+        return () => {
+            socketInstance.disconnect();
+        };
+    }, []);
+
     useEffect(() => {
         if (messageListRef.current) {
-            const { scrollHeight, clientHeight } = messageListRef.current;
-            messageListRef.current.scrollTo({ top: scrollHeight - clientHeight, behavior: 'smooth' });
+            const { scrollHeight } = messageListRef.current;
+            messageListRef.current.scrollTo({ top: scrollHeight, behavior: 'smooth' });
         }
-    }, [messages]);
+    }, [messages, isLoading]);
 
-    /**
-     * Handles the form submission when a user sends a message.
-     * @param {React.FormEvent} e - The form event.
-     */
     const handleSendMessage = (e) => {
         e.preventDefault();
-        if (inputText.trim() === '') return;
+        if (inputText.trim() === '' || !socket) return;
 
         const newUserMessage = { sender: 'user', text: inputText };
-        // Use a functional update to get the latest state
         setMessages(prevMessages => [...prevMessages, newUserMessage]);
-        
-        // --- Simulate AI Response ---
-        setTimeout(() => {
-            const aiResponse = { 
-                sender: 'ai', 
-                text: `This is a simulated AI response to: "${inputText}"` 
-            };
-            setMessages(prevMessages => [...prevMessages, aiResponse]);
-        }, 1000);
+        setIsLoading(true);
+        socket.emit('message', { prompt: inputText });
         
         setInputText('');
     };
@@ -48,8 +50,9 @@ const ChatInterface = () => {
     return (
         <div className={styles.wrapper}>
             <div className={styles.chatContainer}>
-            <h1 className={styles.chatbot_heading}>Hi, i'm specially made for you</h1>
-                {/* The area where messages are displayed */}
+                <h1 className={`${styles.chatbot_heading} ${styles.gradientText}`}>
+                    Hi I'm Chandni, specially made for you
+                </h1>
                 <div className={styles.messageList} ref={messageListRef}>
                     {messages.map((msg, index) => (
                         <div
@@ -57,17 +60,28 @@ const ChatInterface = () => {
                             className={`${styles.messageItem} ${msg.sender === 'user' ? styles.user : styles.ai}`}
                         >
                             <div className={styles.senderName}>
-                                {msg.sender === 'user' ? 'You' : 'AI'}
+                                {msg.sender === 'user' ? 'You' : 'Chandni'}
                             </div>
                             <div className={styles.messageBubble}>
                                 {msg.text}
                             </div>
                         </div>
                     ))}
+                    {isLoading && (
+                        <div className={`${styles.messageItem} ${styles.ai}`}>
+                            <div className={styles.senderName}>AI</div>
+                            <div className={styles.messageBubble}>
+                                <div className={styles.loadingDots}>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
                 
-                {/* The form for user input */}
-                <div className={styles.inputFormWrapper}>
+                <div className={styles.inputFormWrapper}></div>
                     <form onSubmit={handleSendMessage} className={styles.inputForm}>
                         <input
                             type="text"
@@ -76,13 +90,13 @@ const ChatInterface = () => {
                             placeholder="Type your message..."
                             className={styles.inputField}
                         />
-                        <button type="submit" className={styles.sendButton}>
+                        <button type="submit" className={styles.sendButton} disabled={isLoading}>
                             ➤
                         </button>
                     </form>
                 </div>
             </div>
-        </div>
+        
     );
 };
 

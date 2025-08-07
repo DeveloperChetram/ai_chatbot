@@ -29,6 +29,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    padding: 10px;
     max-width: 768px;
     height: 100%;
     max-height: 95vh;
@@ -183,4 +184,54 @@
         height: 40px;
         font-size: 1rem;
     }
+}
+
+/* --- Add these styles to your existing ChatInterface.module.css file --- */
+
+.loadingDots {
+    display: flex;
+    align-items: center;
+    padding: 0.2rem 0;
+}
+
+.loadingDots span {
+    width: 8px;
+    height: 8px;
+    margin: 0 3px;
+    background-color: #9CA3AF; /* A neutral dot color that fits the theme */
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loadingDots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loadingDots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+/* Also add a disabled state for the button */
+.sendButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1.0);
+    }
+}
+
+/* --- You should also add a style for the h1 heading --- */
+.chatbot_heading {
+    text-align: center;
+    color: #f9fafb;
+    font-size: 1.25rem;
+    font-weight: 500;
+    padding: 1.5rem 1rem 0.5rem 1rem;
+    border-bottom: 1px solid #374151;
 }
