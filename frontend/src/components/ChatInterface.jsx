@@ -10,7 +10,7 @@ const ChatInterface = () => {
     const messageListRef = useRef(null);
 
     useEffect(() => {
-        const socketInstance = io('http://localhost:3000');
+        const socketInstance = io('https://ai-chatbot-zn26.onrender.com/');
         setSocket(socketInstance);
 
         socketInstance.on('response', (data) => {
@@ -69,7 +69,7 @@ const ChatInterface = () => {
                     ))}
                     {isLoading && (
                         <div className={`${styles.messageItem} ${styles.ai}`}>
-                            <div className={styles.senderName}>AI</div>
+                            <div className={styles.senderName}>Chandni</div>
                             <div className={styles.messageBubble}>
                                 <div className={styles.loadingDots}>
                                     <span></span>
